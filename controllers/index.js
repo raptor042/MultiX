@@ -1,11 +1,11 @@
 import { ethers } from "ethers"
 import { UNISWAPV2_ROUTER02_ABI, UNISWAPV2_ROUTER02_ADDRESS, WETH_ADDRESS } from "./config.js"
 import { getProvider } from "./provider.js"
-import { getUsers, updateUserPoints, updateUserTokens02 } from "../db/index.js"
+import { getUsers, updateUserPoints, updateUserTokens02, updateUserXP } from "../db/index.js"
 
 const calculateXP = (initialPrice, currentPrice) => {
     const price_change = currentPrice - initialPrice
-    let price_change_percent = undefined
+    let price_change_percent = 0
     let points = 0
 
     if (price_change > 0) {
@@ -25,7 +25,6 @@ export const price = async (address) => {
         UNISWAPV2_ROUTER02_ABI,
         getProvider()
     )
-    console.log(await uniswap.WETH())
 
     const amountsOut = await uniswap.getAmountsOut(
         ethers.parseEther("1"),
@@ -41,6 +40,7 @@ export const getCurrentPrices = async () => {
 
     if (users.length > 0 || users != undefined) {
         users.forEach(async user => {
+            const tokens = user.tokens.length
             user.tokens.forEach(async token => {
                 const quote = await price(token.address)
                 console.log(quote)
@@ -56,10 +56,17 @@ export const getCurrentPrices = async () => {
                 const { price_change, price_change_percent, points } = calculateXP(token.initialPrice, quote)
                 console.log(price_change, price_change_percent, points)
     
-                if (points != undefined) {
+                if (points != 0) {
                     const $user = await updateUserPoints(user.chatId, user.userId, points)
                     console.log($user)
                 }
+
+                const totalPoints = user.points + points
+                const xp = totalPoints / tokens
+                console.log(tokens, totalPoints, xp)
+                
+                const user_ = await updateUserXP(user.chatId, user.userId, xp)
+                console.log(user_)
             })
         })
     }

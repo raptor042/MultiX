@@ -97,3 +97,26 @@ export const updateUserPoints = async (chatId, userId, points) => {
         console.log(err)
     }
 }
+
+export const updateUserXP = async (chatId, userId, xp) => {
+    try {
+        const user = await UserModel.findOneAndUpdate(
+            { chatId : chatId, userId : userId },
+            { $set : { xp : xp } }
+        )
+
+        return user
+    } catch (err) {
+        console.log(err)
+    }
+}
+
+export const deleteUsers = async (chatId) => {
+    try {
+        const user = await UserModel.deleteMany({ chatId : chatId })
+
+        return user
+    } catch (err) {
+        console.log(err)
+    }
+}

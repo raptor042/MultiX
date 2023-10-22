@@ -1,6 +1,6 @@
-import { Telegraf } from "telegraf"
+import { Telegraf, Markup } from "telegraf"
 import { config } from "dotenv"
-import { addUser, connectDB, getUsersInDesc, updateUserTokens01 } from "./db/index.js"
+import { addUser, connectDB, deleteUsers, getUsersInDesc, updateUserTokens01 } from "./db/index.js"
 import { getCurrentPrices, price } from "./controllers/index.js"
 
 config()
@@ -21,7 +21,17 @@ bot.command("start", async ctx => {
         )
         console.log(user)
     
-        ctx.reply(`Hello ${ctx.message.from.username}, My name is MultiX. I am a token tracker bot which is designed to keep track of tokens shilled by the users in this group. You can start shilling!!`)
+        ctx.replyWithHTML(
+            `<b>🏆 The first bot to track who truly provides the most Xs!</b>\n\n<i>Powered by MultiX.</i>`,
+            {
+                parse_mode : "HTML",
+                ...Markup.inlineKeyboard([
+                    [Markup.button.callback("CA Monitoing ✅", "CA")],
+                    [Markup.button.callback("ECAs ✅", "ECAs")],
+                    [Markup.button.callback("Reset Stats 🚫", "reset")]
+                ])
+            }
+        )
     } else {
         ctx.reply("Add this bot to a group to begin using it.")
     }
@@ -42,7 +52,7 @@ bot.hears(/^0x/, async ctx => {
     )
     console.log(user)
 
-    ctx.reply("Token Registered.")
+    ctx.replyWithHTML(`<b>🚀 Contract detected, tracking Xs.</b>`)
 })
 
 bot.command("leaderboard", async ctx => {
@@ -50,12 +60,36 @@ bot.command("leaderboard", async ctx => {
         const users = await getUsersInDesc(ctx.chat.id)
         console.log(users)
 
+        let markup = `<b>📊<u>Leaderboard</u>📊</b>\n\n<i>Most Xs provided by users in this group</i>\n\n`
+
         users.forEach((user, index) => {
-            ctx.replyWithHTML(`<b>${index + 1}.</b>\n<b>Username : ${user.username}</b>\n<b>Points(XP) : ${user.points}</b>\n<b>Tokens Shilled : ${user.tokens.length}</b>`)
-        });
+            if (index == 0) {
+                const html = `<i>🏆 @${user.username}</i>\n<i>🎯 <b>Points:</b> ${user.points}</i>\n<i>💰 <b>Tokens Shilled:</b> ${user.tokens.length}</i>\n<i>🚀 <b>Average Xs:</b> ${user.xp}</i>`
+                markup += html
+            } else if(index == 1) {
+                const html = `<i>🥈 @${user.username}</i>\n<i>🎯 <b>Points:</b> ${user.points}</i>\n<i>💰 <b>Tokens Shilled:</b> ${user.tokens.length}</i>\n<i>🚀 <b>Average Xs:</b> ${user.xp}</i>`
+                markup += html   
+            } else if(index == 1) {
+                const html = `<i>🥉 @${user.username}</i>\n<i>🎯 <b>Points:</b> ${user.points}</i>\n<i>💰 <b>Tokens Shilled:</b> ${user.tokens.length}</i>\n<i>🚀 <b>Average Xs:</b> ${user.xp}</i>`
+                markup += html   
+            } else {
+                const html = `<i>${index + 1} @${user.username}</i>\n<i>🎯 <b>Points:</b> ${user.points}</i>\n<i>💰 <b>Tokens Shilled:</b> ${user.tokens.length}</i>\n<i>🚀 <b>Average Xs:</b> ${user.xp}</i>`
+                markup += html
+            }
+        })
+        console.log(markup)
+
+        ctx.replyWithHTML(markup)
     } else {
         ctx.reply("Add this bot to a group to begin using it.")
     }
+})
+
+bot.action("reset", async ctx => {
+    const users = await deleteUsers(ctx.chat.id)
+    console.log(users)
+
+    ctx.replyWithHTML("<b>Contract tracking disabled 🚫.</b>")
 })
 
 connectDB()
