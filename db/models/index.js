@@ -1,11 +1,11 @@
-import mongoose, { Schema, model } from "mongoose";
+import { Schema, model } from "mongoose";
 
 const UserSchema = new Schema({
     chat : String,
-    chat_id : { type : String, required : true, unique : true },
+    chatId : { type : Number, required : true },
     username : String,
-    user_id : { type : String, required : true, unique : true },
-    points : { type : mongoose.Types.Decimal128, default : new mongoose.Types.Decimal128("0.0") },
+    userId : { type : Number, required : true },
+    points : { type : Number, default : 0 },
     tokens : [
         {
             address : String,

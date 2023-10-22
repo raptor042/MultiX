@@ -27,9 +27,9 @@ export const getUsers = async () => {
     }
 }
 
-export const getUsersInDesc = async (chat_id) => {
+export const getUsersInDesc = async (chatId) => {
     try {
-        const users = await UserModel.find({ chat_id : chat_id }).sort({ points : -1 })
+        const users = await UserModel.find({ chatId : chatId }).sort({ points : -1 })
 
         return users
     } catch (err) {
@@ -37,13 +37,13 @@ export const getUsersInDesc = async (chat_id) => {
     }
 }
 
-export const addUser = async (username, chat, user_id, chat_id) => {
+export const addUser = async (username, chat, userId, chatId) => {
     try {
         const user = new UserModel({
             chat : chat,
             username : username,
-            chat_id : chat_id,
-            user_id : user_id
+            chatId : chatId,
+            userId : userId
         })
 
         const data = await user.save()
@@ -54,7 +54,7 @@ export const addUser = async (username, chat, user_id, chat_id) => {
     }
 }
 
-export const updateUserTokens01 = async (chat_id, user_id, address, price) => {
+export const updateUserTokens01 = async (chatId, userId, address, price) => {
     try {
         const token = {
             address : address,
@@ -63,7 +63,7 @@ export const updateUserTokens01 = async (chat_id, user_id, address, price) => {
         }
 
         const user = await UserModel.findOneAndUpdate(
-            { chat_id : chat_id, user_id : user_id }, 
+            { chatId : chatId, userId : userId }, 
             { $push : { tokens : [token] } })
 
         return user
@@ -72,10 +72,10 @@ export const updateUserTokens01 = async (chat_id, user_id, address, price) => {
     }
 }
 
-export const updateUserTokens02 = async (chat_id, user_id, price, address) => {
+export const updateUserTokens02 = async (chatId, userId, price, address) => {
     try {
         const user = await UserModel.findOneAndUpdate(
-            { chat_id : chat_id, user_id : user_id, tokens : { $elemMatch : { address : address } } },
+            { chatId : chatId, userId : userId, tokens : { $elemMatch : { address : address } } },
             { $set : { "tokens.$.currentPrice" : price } }
         )
 
@@ -85,11 +85,11 @@ export const updateUserTokens02 = async (chat_id, user_id, price, address) => {
     }
 }
 
-export const updateUserPoints = async (chat_id, user_id, points) => {
+export const updateUserPoints = async (chatId, userId, points) => {
     try {
         const user = await UserModel.findOneAndUpdate(
-            { chat_id : chat_id, user_id : user_id }, 
-            { $add : { points : new mongoose.Types.Decimal128(`${points}`) } }
+            { chatId : chatId, userId : userId }, 
+            { $inc : { points : points } }
         )
 
         return user
