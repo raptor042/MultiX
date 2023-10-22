@@ -17,6 +17,16 @@ export const connectDB = async () => {
     }
 }
 
+export const getUser = async (userId, chatId) => {
+    try {
+        const user = await UserModel.findOne({ userId : userId, chatId : chatId })
+
+        return user
+    } catch (err) {
+        console.log(err)
+    }
+}
+
 export const getUsers = async () => {
     try {
         const users = await UserModel.find()

@@ -2,6 +2,7 @@ import { Telegraf, Markup } from "telegraf"
 import { config } from "dotenv"
 import { addUser, connectDB, deleteUsers, getUsersInDesc, updateUserTokens01 } from "./db/index.js"
 import { getCurrentPrices, price } from "./controllers/index.js"
+import { userExists } from "./controllers/misc.js"
 
 config()
 
@@ -11,16 +12,20 @@ const bot = new Telegraf(URL)
 
 bot.use(Telegraf.log())
 
-bot.command("start", async ctx => {
+bot.command("track", async ctx => {
     if (ctx.chat.type == "group") {
-        const user = await addUser(
-            ctx.message.from.username,
-            ctx.chat.title,
-            ctx.message.from.id,
-            ctx.chat.id
-        )
-        console.log(user)
-    
+        const user_exists = await userExists(ctx.message.from.id, ctx.chat.id)
+
+        if (!user_exists) {
+            const user = await addUser(
+                ctx.message.from.username,
+                ctx.chat.title,
+                ctx.message.from.id,
+                ctx.chat.id
+            )
+            console.log(user)
+        }
+
         ctx.replyWithHTML(
             `<b>🏆 The first bot to track who truly provides the most Xs!</b>\n\n<i>Powered by MultiX.</i>`,
             {
@@ -38,25 +43,53 @@ bot.command("start", async ctx => {
 })
 
 bot.hears(/^0x/, async ctx => {
-    const address = ctx.message.text
-    console.log(address)
+    if (ctx.chat.type == "group") {
+        const user_exists = await userExists(ctx.message.from.id, ctx.chat.id)
 
-    const quote = await price(address)
-    console.log(quote)
+        if (!user_exists) {
+            const user = await addUser(
+                ctx.message.from.username,
+                ctx.chat.title,
+                ctx.message.from.id,
+                ctx.chat.id
+            )
+            console.log(user)
+        }
 
-    const user = await updateUserTokens01(
-        ctx.chat.id,
-        ctx.message.from.id,
-        address,
-        quote
-    )
-    console.log(user)
+        const address = ctx.message.text
+        console.log(address)
 
-    ctx.replyWithHTML(`<b>🚀 Contract detected, tracking Xs.</b>`)
+        const quote = await price(address)
+        console.log(quote)
+
+        const user = await updateUserTokens01(
+            ctx.chat.id,
+            ctx.message.from.id,
+            address,
+            quote
+        )
+        console.log(user)
+
+        ctx.replyWithHTML(`<b>🚀 Contract detected, tracking Xs.</b>`)
+    } else {
+        ctx.reply("Add this bot to a group to begin using it.")
+    }
 })
 
 bot.command("leaderboard", async ctx => {
     if (ctx.chat.type == "group") {
+        const user_exists = await userExists(ctx.message.from.id, ctx.chat.id)
+
+        if (!user_exists) {
+            const user = await addUser(
+                ctx.message.from.username,
+                ctx.chat.title,
+                ctx.message.from.id,
+                ctx.chat.id
+            )
+            console.log(user)
+        }
+
         const users = await getUsersInDesc(ctx.chat.id)
         console.log(users)
 
@@ -64,20 +97,19 @@ bot.command("leaderboard", async ctx => {
 
         users.forEach((user, index) => {
             if (index == 0) {
-                const html = `<i>🏆 @${user.username}</i>\n<i>🎯 <b>Points:</b> ${user.points}</i>\n<i>💰 <b>Tokens Shilled:</b> ${user.tokens.length}</i>\n<i>🚀 <b>Average Xs:</b> ${user.xp}</i>`
+                const html = `<i>🏆 @${user.username}</i>\n<i>🎯 <b>Points:</b> ${user.points}</i>\n<i>💰 <b>Tokens Shilled:</b> ${user.tokens.length}</i>\n<i>🚀 <b>Average Xs:</b> ${user.xp}</i>\n\n`
                 markup += html
             } else if(index == 1) {
-                const html = `<i>🥈 @${user.username}</i>\n<i>🎯 <b>Points:</b> ${user.points}</i>\n<i>💰 <b>Tokens Shilled:</b> ${user.tokens.length}</i>\n<i>🚀 <b>Average Xs:</b> ${user.xp}</i>`
+                const html = `<i>🥈 @${user.username}</i>\n<i>🎯 <b>Points:</b> ${user.points}</i>\n<i>💰 <b>Tokens Shilled:</b> ${user.tokens.length}</i>\n<i>🚀 <b>Average Xs:</b> ${user.xp}</i>\n\n`
                 markup += html   
-            } else if(index == 1) {
-                const html = `<i>🥉 @${user.username}</i>\n<i>🎯 <b>Points:</b> ${user.points}</i>\n<i>💰 <b>Tokens Shilled:</b> ${user.tokens.length}</i>\n<i>🚀 <b>Average Xs:</b> ${user.xp}</i>`
+            } else if(index == 2) {
+                const html = `<i>🥉 @${user.username}</i>\n<i>🎯 <b>Points:</b> ${user.points}</i>\n<i>💰 <b>Tokens Shilled:</b> ${user.tokens.length}</i>\n<i>🚀 <b>Average Xs:</b> ${user.xp}</i>\n\n`
                 markup += html   
             } else {
-                const html = `<i>${index + 1} @${user.username}</i>\n<i>🎯 <b>Points:</b> ${user.points}</i>\n<i>💰 <b>Tokens Shilled:</b> ${user.tokens.length}</i>\n<i>🚀 <b>Average Xs:</b> ${user.xp}</i>`
+                const html = `<i>${index + 1} @${user.username}</i>\n<i>🎯 <b>Points:</b> ${user.points}</i>\n<i>💰 <b>Tokens Shilled:</b> ${user.tokens.length}</i>\n<i>🚀 <b>Average Xs:</b> ${user.xp}</i>\n\n`
                 markup += html
             }
         })
-        console.log(markup)
 
         ctx.replyWithHTML(markup)
     } else {
