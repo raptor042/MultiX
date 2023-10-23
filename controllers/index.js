@@ -36,7 +36,6 @@ export const price = async (address) => {
 
 export const getCurrentPrices = async () => {
     const users = await getUsers()
-    console.log(users)
 
     if (users.length > 0 || users != undefined) {
         users.forEach(async user => {

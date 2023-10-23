@@ -13,7 +13,7 @@ const bot = new Telegraf(URL)
 bot.use(Telegraf.log())
 
 bot.command("track", async ctx => {
-    if (ctx.chat.type == "group") {
+    if (ctx.chat.type == "group" || "supergroup" || "channel") {
         const user_exists = await userExists(ctx.message.from.id, ctx.chat.id)
 
         if (!user_exists) {
@@ -73,7 +73,7 @@ bot.action("disable", async ctx => {
 })
 
 bot.hears(/^0x/, async ctx => {
-    if (ctx.chat.type == "group") {
+    if (ctx.chat.type == "group" || "supergroup" || "channel") {
         const user_exists = await userExists(ctx.message.from.id, ctx.chat.id)
 
         if (!user_exists) {
@@ -113,7 +113,7 @@ bot.hears(/^0x/, async ctx => {
 })
 
 bot.command("leaderboard", async ctx => {
-    if (ctx.chat.type == "group") {
+    if (ctx.chat.type == "group" || "supergroup" || "channel") {
         const user_exists = await userExists(ctx.message.from.id, ctx.chat.id)
 
         if (!user_exists) {
@@ -161,7 +161,7 @@ bot.hears(/^ECA/, async ctx => {
     const user = await getUser(ctx.message.from.id, ctx.chat.id)
 
     if(user.tracking == "Enabled") {
-        const [_, address] = ctx.message.text.split(" ", 1)
+        const [_, address] = ctx.message.text.split(" ")
         console.log(address)
 
         const user = await updateUserTag(
