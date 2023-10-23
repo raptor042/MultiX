@@ -1,6 +1,6 @@
 import { Telegraf, Markup } from "telegraf"
 import { config } from "dotenv"
-import { addUser, connectDB, deleteUsers, getUsersInDesc, updateUserTokens01 } from "./db/index.js"
+import { addUser, connectDB, getUser, getUsersInDesc, updateUserPointsAndXP, updateUserTag, updateUserTokens01, updateUsersTracking } from "./db/index.js"
 import { getCurrentPrices, price } from "./controllers/index.js"
 import { userExists } from "./controllers/misc.js"
 
@@ -26,20 +26,50 @@ bot.command("track", async ctx => {
             console.log(user)
         }
 
-        ctx.replyWithHTML(
-            `<b>🏆 The first bot to track who truly provides the most Xs!</b>\n\n<i>Powered by MultiX.</i>`,
-            {
-                parse_mode : "HTML",
-                ...Markup.inlineKeyboard([
-                    [Markup.button.callback("CA Monitoing ✅", "CA")],
-                    [Markup.button.callback("ECAs ✅", "ECAs")],
-                    [Markup.button.callback("Reset Stats 🚫", "reset")]
-                ])
-            }
-        )
+        const user = await getUser(ctx.message.from.id, ctx.chat.id)
+        
+        if(user.tracking == "Enabled") {
+            ctx.replyWithHTML(
+                `<b>🏆 The first bot to track who truly provides the most Xs!</b>\n\n<i>Powered by MultiX.</i>`,
+                {
+                    parse_mode : "HTML",
+                    ...Markup.inlineKeyboard([
+                        [Markup.button.callback("Disable CA Monitoing 🚫", "disable")],
+                        [Markup.button.callback("ECAs 📈", "ECAs")],
+                        [Markup.button.callback("Reset Stats ⚠️", "reset")]
+                    ])
+                }
+            )
+        } else if(user.tracking == "Disabled") {
+            ctx.replyWithHTML(
+                `<b>🏆 The first bot to track who truly provides the most Xs!</b>\n\n<i>Powered by MultiX.</i>`,
+                {
+                    parse_mode : "HTML",
+                    ...Markup.inlineKeyboard([
+                        [Markup.button.callback("Enable CA Monitoing ✅", "enable")],
+                        [Markup.button.callback("ECAs 📈", "ECAs")],
+                        [Markup.button.callback("Reset Stats ⚠️", "reset")]
+                    ])
+                }
+            )
+        }
     } else {
         ctx.reply("Add this bot to a group to begin using it.")
     }
+})
+
+bot.action("enable", async ctx => {
+    const users = await updateUsersTracking(ctx.chat.id, "Enabled")
+    console.log(users)
+
+    ctx.replyWithHTML("<b>Contract tracking enabled ✅.</b>\n\n<b>Lets go!!! 🚀</b>")
+})
+
+bot.action("disable", async ctx => {
+    const users = await updateUsersTracking(ctx.chat.id, "Disabled")
+    console.log(users)
+
+    ctx.replyWithHTML("<b>Contract tracking disabled 🚫.</b>")
 })
 
 bot.hears(/^0x/, async ctx => {
@@ -56,21 +86,27 @@ bot.hears(/^0x/, async ctx => {
             console.log(user)
         }
 
-        const address = ctx.message.text
-        console.log(address)
+        const user = await getUser(ctx.message.from.id, ctx.chat.id)
 
-        const quote = await price(address)
-        console.log(quote)
+        if(user.tracking == "Enabled") {
+            const address = ctx.message.text
+            console.log(address)
 
-        const user = await updateUserTokens01(
-            ctx.chat.id,
-            ctx.message.from.id,
-            address,
-            quote
-        )
-        console.log(user)
+            const quote = await price(address)
+            console.log(quote)
 
-        ctx.replyWithHTML(`<b>🚀 Contract detected, tracking Xs.</b>`)
+            const user = await updateUserTokens01(
+                ctx.chat.id,
+                ctx.message.from.id,
+                address,
+                quote
+            )
+            console.log(user)
+
+            ctx.replyWithHTML(`<b>🚀 Contract detected, tracking Xs.</b>`)
+        } else if(user.tracking == "Disabled") {
+            ctx.replyWithHTML("<b>Contract tracking is disabled 🚫.</b>")
+        }
     } else {
         ctx.reply("Add this bot to a group to begin using it.")
     }
@@ -117,11 +153,35 @@ bot.command("leaderboard", async ctx => {
     }
 })
 
+bot.action("ECAs", ctx => {
+    ctx.replyWithHTML("<b>Enter the contract address in this format:</b>\n\n<i>ECA 'contract address'</i>")
+})
+
+bot.hears(/^ECA/, async ctx => {
+    const user = await getUser(ctx.message.from.id, ctx.chat.id)
+
+    if(user.tracking == "Enabled") {
+        const [_, address] = ctx.message.text.split(" ", 1)
+        console.log(address)
+
+        const user = await updateUserTag(
+            ctx.chat.id,
+            ctx.message.from.id,
+            address
+        )
+        console.log(user)
+
+        ctx.replyWithHTML(`<b>🚀 Contract detected, tracking Xs will begin once liquidity is added.</b>`)
+    } else if(user.tracking == "Disabled") {
+        ctx.replyWithHTML("<b>Contract tracking is disabled 🚫.</b>")
+    }
+})
+
 bot.action("reset", async ctx => {
-    const users = await deleteUsers(ctx.chat.id)
+    const users = await updateUserPointsAndXP(ctx.chat.id)
     console.log(users)
 
-    ctx.replyWithHTML("<b>Contract tracking disabled 🚫.</b>")
+    ctx.replyWithHTML("<b>The Leaderboard have been reset.</b>\n\n<b>Lets go again!!! 🚀</b>")
 })
 
 connectDB()

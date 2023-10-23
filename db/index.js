@@ -74,7 +74,8 @@ export const updateUserTokens01 = async (chatId, userId, address, price) => {
 
         const user = await UserModel.findOneAndUpdate(
             { chatId : chatId, userId : userId }, 
-            { $push : { tokens : [token] } })
+            { $push : { tokens : [token] } }
+        )
 
         return user
     } catch (err) {
@@ -113,6 +114,52 @@ export const updateUserXP = async (chatId, userId, xp) => {
         const user = await UserModel.findOneAndUpdate(
             { chatId : chatId, userId : userId },
             { $set : { xp : xp } }
+        )
+
+        return user
+    } catch (err) {
+        console.log(err)
+    }
+}
+
+export const updateUsersTracking = async (chatId, tracking) => {
+    try {
+        const user = await UserModel.updateMany(
+            { chatId : chatId },
+            { $set : { tracking : tracking } }
+        )
+
+        return user
+    } catch (err) {
+        console.log(err)
+    }
+}
+
+export const updateUserPointsAndXP = async (chatId) => {
+    try {
+        const user = await UserModel.updateMany(
+            { chatId : chatId },
+            { $set : { points : 0, xp : 0.0, tokens : [] } }
+        )
+
+        return user
+    } catch (err) {
+        console.log(err)
+    }
+}
+
+export const updateUserTag = async (chatId, userId, address) => {
+    try {
+        const token = {
+            address : address,
+            initialPrice : 0.0,
+            currentPrice : 0.0,
+            tag : "ECA"
+        }
+
+        const user = await UserModel.findOneAndUpdate(
+            { chatId : chatId, userId : userId }, 
+            { $push : { tokens : [token] } }
         )
 
         return user

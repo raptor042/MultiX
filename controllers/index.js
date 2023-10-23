@@ -41,33 +41,36 @@ export const getCurrentPrices = async () => {
     if (users.length > 0 || users != undefined) {
         users.forEach(async user => {
             const tokens = user.tokens.length
-            user.tokens.forEach(async token => {
-                const quote = await price(token.address)
-                console.log(quote)
-    
-                const _user = await updateUserTokens02(
-                    user.chatId,
-                    user.userId,
-                    quote,
-                    token.address
-                )
-                console.log(_user)
-    
-                const { price_change, price_change_percent, points } = calculateXP(token.initialPrice, quote)
-                console.log(price_change, price_change_percent, points)
-    
-                if (points != 0) {
-                    const $user = await updateUserPoints(user.chatId, user.userId, points)
-                    console.log($user)
-                }
 
-                const totalPoints = user.points + points
-                const xp = totalPoints / tokens
-                console.log(tokens, totalPoints, xp)
-                
-                const user_ = await updateUserXP(user.chatId, user.userId, xp)
-                console.log(user_)
-            })
+            if(user.tracking == "Enabled") {
+                user.tokens.forEach(async token => {
+                    const quote = await price(token.address)
+                    console.log(quote)
+        
+                    const _user = await updateUserTokens02(
+                        user.chatId,
+                        user.userId,
+                        quote,
+                        token.address
+                    )
+                    console.log(_user)
+        
+                    const { price_change, price_change_percent, points } = calculateXP(token.initialPrice, quote)
+                    console.log(price_change, price_change_percent, points)
+        
+                    if (points != 0) {
+                        const $user = await updateUserPoints(user.chatId, user.userId, points)
+                        console.log($user)
+                    }
+    
+                    const totalPoints = user.points + points
+                    const xp = totalPoints / tokens
+                    console.log(tokens, totalPoints, xp)
+                    
+                    const user_ = await updateUserXP(user.chatId, user.userId, xp)
+                    console.log(user_)
+                })   
+            }
         })
     }
 }

@@ -6,14 +6,16 @@ const UserSchema = new Schema({
     username : String,
     userId : { type : Number, required : true },
     points : { type : Number, default : 0 },
-    xp : { type : mongoose.Types.Decimal128, default : new mongoose.Types.Decimal128("0.0") },
+    xp : { type : Number, default : 0.0 },
     tokens : [
         {
             address : String,
             initialPrice : Number,
-            currentPrice : Number
+            currentPrice : Number,
+            tag : String
         }
-    ]
+    ],
+    tracking : { type : String, enum : ["Enabled", "Disabled"], default : "Enabled" }
 })
 
 export const UserModel = model("User", UserSchema)
