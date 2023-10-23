@@ -41,7 +41,7 @@ export const getCurrentPrices = async () => {
         users.forEach(async user => {
             const tokens = user.tokens.length
 
-            if(user.tracking == "Enabled") {
+            if(user.CA_tracking == "Enabled" || user.ECA_tracking == "Enabled") {
                 user.tokens.forEach(async token => {
                     const quote = await price(token.address)
                     console.log(quote)

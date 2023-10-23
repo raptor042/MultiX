@@ -12,10 +12,10 @@ const UserSchema = new Schema({
             address : String,
             initialPrice : Number,
             currentPrice : Number,
-            tag : String
         }
     ],
-    tracking : { type : String, enum : ["Enabled", "Disabled"], default : "Enabled" }
+    CA_tracking : { type : String, enum : ["Enabled", "Disabled"], default : "Disabled" },
+    ECA_tracking : { type : String, enum : ["Enabled", "Disabled"], default : "Disabled" }
 })
 
 export const UserModel = model("User", UserSchema)
