@@ -74,10 +74,11 @@ export const addUser = async (username, chat, userId, chatId) => {
     }
 }
 
-export const addTracking = async (chatId) => {
+export const addTracking = async (chatId, type) => {
     try {
         const chat = new ChatModel({
-            chatId : chatId
+            chatId : chatId,
+            type : type
         })
 
         const data = await chat.save()

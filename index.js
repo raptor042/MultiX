@@ -28,26 +28,29 @@ bot.command("track", async ctx => {
         }
         if (!chat_exists) {
             const chat = await addTracking(
-                ctx.chat.id
+                ctx.chat.id,
+                ctx.chat.type
             )
             console.log(chat)
         }
 
-        ctx.replyWithHTML(
+        await ctx.replyWithHTML(
             `<b>🏆 The first bot to track who truly provides the most Xs!</b>\n\n<i>Powered by MultiX.</i>`,
             {
                 parse_mode : "HTML",
                 ...Markup.inlineKeyboard([
-                    [Markup.button.callback("Enable CA Monitoing ✅", "enableCA")],
-                    [Markup.button.callback("Disable CA Monitoing 🚫", "disableCA")],
+                    [Markup.button.callback("Enable CA Monitoring ✅", "enableCA")],
+                    [Markup.button.callback("Disable CA Monitoring 🚫", "disableCA")],
                     [Markup.button.callback("Enable ECAs ✅", "enableECA")],
                     [Markup.button.callback("Disable ECAs 🚫", "disableECA")],
-                    [Markup.button.callback("Reset Stats ⚠️", "reset")]
+                    [Markup.button.callback("Reset Stats ⚠️", "reset")],
+                    [Markup.button.url("Support", "https://t.me/NeutronCrypto")],
+                    [Markup.button.url("Multix TG", "https://t.me/MultiXERC")]
                 ])
             }
         )
     } else {
-        ctx.reply("Add this bot to a group to begin using it.")
+        await ctx.reply("Add this bot to a group to begin using it.")
     }
 })
 
@@ -55,28 +58,28 @@ bot.action("enableCA", async ctx => {
     const chat = await updateTracking(ctx.chat.id, "CA", "Enabled")
     console.log(chat)
 
-    ctx.replyWithHTML("<b>Contract Tracking is enabled ✅</b>")
+    await ctx.replyWithHTML("<b>Contract Tracking is enabled ✅</b>")
 })
 
 bot.action("disableCA", async ctx => {
     const chat = await updateTracking(ctx.chat.id, "CA", "Disabled")
     console.log(chat)
 
-    ctx.replyWithHTML("<b>Contract Tracking is disabled 🚫</b>")
+    await ctx.replyWithHTML("<b>Contract Tracking is disabled 🚫</b>")
 })
 
 bot.action("enableECA", async ctx => {
     const chat = await updateTracking(ctx.chat.id, "ECA", "Enabled")
     console.log(chat)
 
-    ctx.replyWithHTML("<b>ECA Tracking is enabled ✅</b>")
+    await ctx.replyWithHTML("<b>ECA Tracking is enabled ✅</b>")
 })
 
 bot.action("disableECA", async ctx => {
     const chat = await updateTracking(ctx.chat.id, "ECA", "Disabled")
     console.log(chat)
 
-    ctx.replyWithHTML("<b>ECA Tracking is disabled 🚫</b>")
+    await ctx.replyWithHTML("<b>ECA Tracking is disabled 🚫</b>")
 })
 
 bot.hears(/^0x/, async ctx => {
@@ -95,7 +98,8 @@ bot.hears(/^0x/, async ctx => {
         }
         if (!chat_exists) {
             const chat = await addTracking(
-                ctx.chat.id
+                ctx.chat.id,
+                ctx.chat.type
             )
             console.log(chat)
         }
@@ -118,13 +122,13 @@ bot.hears(/^0x/, async ctx => {
             console.log(user)
 
             if(quote > 0) {
-                ctx.replyWithHTML(`<b>🚀 Contract detected, tracking Xs.</b>`)
+                await ctx.replyWithHTML(`<b>🚀 Contract detected, tracking Xs.</b>`)
             } else {
-                ctx.replyWithHTML(`<b>🚀 ECA detected, tracking Xs will begin once liquidity is added.</b>`)
+                await ctx.replyWithHTML(`<b>🚀 ECA detected, tracking Xs will begin once liquidity is added.</b>`)
             }
         }
     } else {
-        ctx.reply("Add this bot to a group to begin using it.")
+        await ctx.reply("Add this bot to a group to begin using it.")
     }
 })
 
@@ -144,7 +148,8 @@ bot.command("leaderboard", async ctx => {
         }
         if (!chat_exists) {
             const chat = await addTracking(
-                ctx.chat.id
+                ctx.chat.id,
+                ctx.chat.type
             )
             console.log(chat)
         }
@@ -170,9 +175,9 @@ bot.command("leaderboard", async ctx => {
             }
         })
 
-        ctx.replyWithHTML(markup)
+        await ctx.replyWithHTML(markup)
     } else {
-        ctx.reply("Add this bot to a group to begin using it.")
+        await ctx.reply("Add this bot to a group to begin using it.")
     }
 })
 
@@ -180,7 +185,7 @@ bot.action("reset", async ctx => {
     const users = await updateUserPointsAndXP(ctx.chat.id)
     console.log(users)
 
-    ctx.replyWithHTML("<b>The Leaderboard have been reset.</b>\n\n<b>Lets go again!!! 🚀</b>")
+    await ctx.replyWithHTML("<b>The Leaderboard have been reset.</b>\n\n<b>Lets go again!!! 🚀</b>")
 })
 
 connectDB()

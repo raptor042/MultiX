@@ -19,7 +19,8 @@ const UserSchema = new Schema({
 const ChatSchema = new Schema({
     chatId : { type : Number, required : true },
     CA_tracking : { type : String, enum : ["Enabled", "Disabled"], default : "Disabled" },
-    ECA_tracking : { type : String, enum : ["Enabled", "Disabled"], default : "Disabled" }
+    ECA_tracking : { type : String, enum : ["Enabled", "Disabled"], default : "Disabled" },
+    type : String
 })
 
 export const UserModel = model("User", UserSchema)
