@@ -13,9 +13,15 @@ const UserSchema = new Schema({
             initialPrice : Number,
             currentPrice : Number,
         }
-    ],
+    ]
+})
+
+const ChatSchema = new Schema({
+    chatId : { type : Number, required : true },
     CA_tracking : { type : String, enum : ["Enabled", "Disabled"], default : "Disabled" },
     ECA_tracking : { type : String, enum : ["Enabled", "Disabled"], default : "Disabled" }
 })
 
 export const UserModel = model("User", UserSchema)
+
+export const ChatModel = model("Chat", ChatSchema)

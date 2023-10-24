@@ -1,6 +1,6 @@
 import mongoose, { connect } from "mongoose"
 import dotenv from "dotenv"
-import { UserModel } from "./models/index.js"
+import { ChatModel, UserModel } from "./models/index.js"
 
 const { config } = dotenv
 
@@ -22,6 +22,16 @@ export const getUser = async (userId, chatId) => {
         const user = await UserModel.findOne({ userId : userId, chatId : chatId })
 
         return user
+    } catch (err) {
+        console.log(err)
+    }
+}
+
+export const getChat = async (chatId) => {
+    try {
+        const chat = await ChatModel.findOne({ chatId : chatId })
+
+        return chat
     } catch (err) {
         console.log(err)
     }
@@ -59,6 +69,42 @@ export const addUser = async (username, chat, userId, chatId) => {
         const data = await user.save()
 
         return data
+    } catch (err) {
+        console.log(err)
+    }
+}
+
+export const addTracking = async (chatId) => {
+    try {
+        const chat = new ChatModel({
+            chatId : chatId
+        })
+
+        const data = await chat.save()
+
+        return data
+    } catch (err) {
+        console.log(err)
+    }
+}
+
+export const updateTracking = async (chatId, entity, tracking) => {
+    try {
+        if(entity == "CA") {
+            const chat = await ChatModel.findOneAndUpdate(
+                { chatId : chatId },
+                { $set : { CA_tracking : tracking } }
+            )
+    
+            return chat
+        } else {
+            const chat = await ChatModel.findOneAndUpdate(
+                { chatId : chatId },
+                { $set : { ECA_tracking : tracking } }
+            )
+    
+            return chat
+        }
     } catch (err) {
         console.log(err)
     }
@@ -114,32 +160,6 @@ export const updateUserXP = async (chatId, userId, xp) => {
         const user = await UserModel.findOneAndUpdate(
             { chatId : chatId, userId : userId },
             { $set : { xp : xp } }
-        )
-
-        return user
-    } catch (err) {
-        console.log(err)
-    }
-}
-
-export const updateUsersCATracking = async (chatId, tracking) => {
-    try {
-        const user = await UserModel.updateMany(
-            { chatId : chatId },
-            { $set : { CA_tracking : tracking } }
-        )
-
-        return user
-    } catch (err) {
-        console.log(err)
-    }
-}
-
-export const updateUsersECATracking = async (chatId, tracking) => {
-    try {
-        const user = await UserModel.updateMany(
-            { chatId : chatId },
-            { $set : { ECA_tracking : tracking } }
         )
 
         return user
