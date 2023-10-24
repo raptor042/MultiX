@@ -13,3 +13,13 @@ export const chatExists = async (chatId) => {
 
     return chat ? true : false
 }
+
+export const extract = (str) => {
+    const startIndex = str.indexOf("0x")
+    const endIndex = startIndex + 42 + 1
+    console.log(startIndex, endIndex)
+
+    const address = str.slice(startIndex, endIndex)
+
+    return address
+}

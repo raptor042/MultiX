@@ -1,8 +1,8 @@
 import { Telegraf, Markup } from "telegraf"
 import { config } from "dotenv"
 import { addTracking, addUser, connectDB, getChat, getUsersInDesc, updateTracking, updateUserPointsAndXP, updateUserTokens01 } from "./db/index.js"
-import { getCurrentPrices, price } from "./controllers/index.js"
-import { chatExists, userExists } from "./controllers/misc.js"
+import { getCurrentPrices, getPair, price } from "./controllers/index.js"
+import { chatExists, extract, userExists } from "./controllers/misc.js"
 
 config()
 
@@ -117,6 +117,59 @@ bot.hears(/^0x/, async ctx => {
                 ctx.chat.id,
                 ctx.message.from.id,
                 address,
+                quote
+            )
+            console.log(user)
+
+            if(quote > 0) {
+                await ctx.replyWithHTML(`<b>🚀 Contract detected, tracking Xs.</b>`)
+            } else {
+                await ctx.replyWithHTML(`<b>🚀 ECA detected, tracking Xs will begin once liquidity is added.</b>`)
+            }
+        }
+    } else {
+        await ctx.reply("Add this bot to a group to begin using it.")
+    }
+})
+
+bot.hears(/dextools/, async ctx => {
+    if (ctx.chat.type == "group" || "supergroup" || "channel") {
+        const user_exists = await userExists(ctx.message.from.id, ctx.chat.id)
+        const chat_exists = await chatExists(ctx.chat.id)
+
+        if (!user_exists) {
+            const user = await addUser(
+                ctx.message.from.username,
+                ctx.chat.title,
+                ctx.message.from.id,
+                ctx.chat.id
+            )
+            console.log(user)
+        }
+        if (!chat_exists) {
+            const chat = await addTracking(
+                ctx.chat.id,
+                ctx.chat.type
+            )
+            console.log(chat)
+        }
+
+        const chat = await getChat(ctx.chat.id)
+
+        if(chat.CA_tracking == "Enabled" || chat.ECA_tracking == "Enabled") {
+            const address = extract(ctx.message.text)
+            console.log(address)
+
+            const [token0, _] = await getPair(address)
+            console.log(token0)
+
+            const quote = await price(token0)
+            console.log(quote)
+
+            const user = await updateUserTokens01(
+                ctx.chat.id,
+                ctx.message.from.id,
+                token0,
                 quote
             )
             console.log(user)

@@ -1,5 +1,5 @@
 import { ethers } from "ethers"
-import { UNISWAPV2_ROUTER02_ABI, UNISWAPV2_ROUTER02_ADDRESS, WETH_ADDRESS } from "./config.js"
+import { UNISWAPV2_PAIR_ABI, UNISWAPV2_ROUTER02_ABI, UNISWAPV2_ROUTER02_ADDRESS, WETH_ADDRESS } from "./config.js"
 import { getProvider } from "./provider.js"
 import { getUsers, updateUserPoints, updateUserTokens02, updateUserXP } from "../db/index.js"
 
@@ -17,6 +17,19 @@ const calculateXP = (initialPrice, currentPrice) => {
     }
 
     return { price_change, price_change_percent, points }
+}
+
+export const getPair = async (address) => {
+    const uniswap = new ethers.Contract(
+        address,
+        UNISWAPV2_PAIR_ABI,
+        getProvider()
+    )
+
+    return [
+        await uniswap.token0(),
+        await uniswap.token1()
+    ]
 }
 
 export const price = async (address) => {
