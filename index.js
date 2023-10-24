@@ -46,58 +46,6 @@ bot.command("track", async ctx => {
                 ])
             }
         )
-
-        // const chat = await getChat(ctx.chat.id)
-        
-        // if(chat.CA_tracking == "Enabled" && chat.ECA_tracking == "Enabled") {
-        //     ctx.replyWithHTML(
-        //         `<b>🏆 The first bot to track who truly provides the most Xs!</b>\n\n<i>Powered by MultiX.</i>`,
-        //         {
-        //             parse_mode : "HTML",
-        //             ...Markup.inlineKeyboard([
-        //                 [Markup.button.callback("CA Monitoing 🚫", "disableCA")],
-        //                 [Markup.button.callback("ECAs 🚫", "disableECA")],
-        //                 [Markup.button.callback("Reset Stats ⚠️", "reset")]
-        //             ])
-        //         }
-        //     )
-        // } else if(chat.CA_tracking == "Disabled" && chat.ECA_tracking == "Disabled") {
-        //     ctx.replyWithHTML(
-        //         `<b>🏆 The first bot to track who truly provides the most Xs!</b>\n\n<i>Powered by MultiX.</i>`,
-        //         {
-        //             parse_mode : "HTML",
-        //             ...Markup.inlineKeyboard([
-        //                 [Markup.button.callback("CA Monitoing ✅", "enableCA")],
-        //                 [Markup.button.callback("ECAs ✅", "enableECA")],
-        //                 [Markup.button.callback("Reset Stats ⚠️", "reset")]
-        //             ])
-        //         }
-        //     )
-        // } else if(chat.CA_tracking == "Enabled" && chat.ECA_tracking == "Disabled") {
-        //     ctx.replyWithHTML(
-        //         `<b>🏆 The first bot to track who truly provides the most Xs!</b>\n\n<i>Powered by MultiX.</i>`,
-        //         {
-        //             parse_mode : "HTML",
-        //             ...Markup.inlineKeyboard([
-        //                 [Markup.button.callback("CA Monitoing 🚫", "disableCA")],
-        //                 [Markup.button.callback("ECAs ✅", "enableECA")],
-        //                 [Markup.button.callback("Reset Stats ⚠️", "reset")]
-        //             ])
-        //         }
-        //     )
-        // } else if(chat.CA_tracking == "Disabled" && chat.ECA_tracking == "Enabled") {
-        //     ctx.replyWithHTML(
-        //         `<b>🏆 The first bot to track who truly provides the most Xs!</b>\n\n<i>Powered by MultiX.</i>`,
-        //         {
-        //             parse_mode : "HTML",
-        //             ...Markup.inlineKeyboard([
-        //                 [Markup.button.callback("CA Monitoing ✅", "enableCA")],
-        //                 [Markup.button.callback("ECAs 🚫", "disableECA")],
-        //                 [Markup.button.callback("Reset Stats ⚠️", "reset")]
-        //             ])
-        //         }
-        //     )
-        // }
     } else {
         ctx.reply("Add this bot to a group to begin using it.")
     }
@@ -106,21 +54,29 @@ bot.command("track", async ctx => {
 bot.action("enableCA", async ctx => {
     const chat = await updateTracking(ctx.chat.id, "CA", "Enabled")
     console.log(chat)
+
+    ctx.replyWithHTML("<b>Contract Tracking is enabled ✅</b>")
 })
 
 bot.action("disableCA", async ctx => {
     const chat = await updateTracking(ctx.chat.id, "CA", "Disabled")
     console.log(chat)
+
+    ctx.replyWithHTML("<b>Contract Tracking is disabled 🚫</b>")
 })
 
 bot.action("enableECA", async ctx => {
     const chat = await updateTracking(ctx.chat.id, "ECA", "Enabled")
     console.log(chat)
+
+    ctx.replyWithHTML("<b>ECA Tracking is enabled ✅</b>")
 })
 
 bot.action("disableECA", async ctx => {
     const chat = await updateTracking(ctx.chat.id, "ECA", "Disabled")
     console.log(chat)
+
+    ctx.replyWithHTML("<b>ECA Tracking is disabled 🚫</b>")
 })
 
 bot.hears(/^0x/, async ctx => {
@@ -161,7 +117,11 @@ bot.hears(/^0x/, async ctx => {
             )
             console.log(user)
 
-            ctx.replyWithHTML(`<b>🚀 Contract detected, tracking Xs.</b>`)
+            if(quote > 0) {
+                ctx.replyWithHTML(`<b>🚀 Contract detected, tracking Xs.</b>`)
+            } else {
+                ctx.replyWithHTML(`<b>🚀 ECA detected, tracking Xs will begin once liquidity is added.</b>`)
+            }
         }
     } else {
         ctx.reply("Add this bot to a group to begin using it.")
