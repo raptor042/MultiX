@@ -107,7 +107,7 @@ bot.hears(/^0x/, async ctx => {
         const chat = await getChat(ctx.chat.id)
 
         if(chat.CA_tracking == "Enabled" || chat.ECA_tracking == "Enabled") {
-            const address = ctx.message.text
+            const address = extract(ctx.message.text)
             console.log(address)
 
             const quote = await price(address)
@@ -132,7 +132,7 @@ bot.hears(/^0x/, async ctx => {
     }
 })
 
-bot.hears(/dextools/, async ctx => {
+bot.hears(/0x/, async ctx => {
     if (ctx.chat.type == "group" || "supergroup" || "channel") {
         const user_exists = await userExists(ctx.message.from.id, ctx.chat.id)
         const chat_exists = await chatExists(ctx.chat.id)
