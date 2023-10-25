@@ -131,7 +131,7 @@ bot.hears(/0x/, async ctx => {
                         await ctx.replyWithHTML(`<b>🚀 ECA detected, tracking Xs will begin once liquidity is added.</b>`)
                     }
                 } else if(token0 == null && quote == null) {
-                    await ctx.replyWithHTML(`<b>🚫 Cannot tracked this address.</b>`)
+                    await ctx.replyWithHTML(`<b>🚫 Cannot track this address.</b>`)
                 } else {
                     const user = await updateUserTokens01(
                         ctx.chat.id,
