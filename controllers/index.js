@@ -48,24 +48,26 @@ export const price = async (address) => {
 }
 
 export const getPrice = async (address) => {
+    let quote = null
+
     try {
-        const quote = await price(address)
+        const [token0, _] = await getPair(address)
+        console.log(token0)
+
+        quote = await price(token0)
+        console.log(quote)
+
+        return [token0, quote]
+    } catch (err) {
+        console.log(err)
+
+        quote = await price(address)
         console.log(quote)
 
         return [null, quote]
-    } catch (err) {
-        if(isError(err, "CALL_EXCEPTION")) {
-            console.log("Call Exception Error")
-
-            const [token0, _] = await getPair(address)
-            console.log(token0)
-
-            const quote = await price(token0)
-            console.log(quote)
-
-            return [token0, quote]
-        } else {
-            return [null, 0]
+    } finally {
+        if (quote == null) {
+            return [null, null]
         }
     }
 }
