@@ -1,4 +1,4 @@
-import { ethers, isError } from "ethers"
+import { ethers } from "ethers"
 import { UNISWAPV2_PAIR_ABI, UNISWAPV2_ROUTER02_ABI, UNISWAPV2_ROUTER02_ADDRESS, WETH_ADDRESS } from "./config.js"
 import { getProvider } from "./provider.js"
 import { getUsers, updateUserPoints, updateUserTokens02, updateUserXP } from "../db/index.js"
@@ -79,35 +79,29 @@ export const getCurrentPrices = async () => {
         users.forEach(async user => {
             const tokens = user.tokens.length
 
-            if(user.CA_tracking == "Enabled" || user.ECA_tracking == "Enabled") {
-                user.tokens.forEach(async token => {
-                    const quote = await getPrice(token.address)
-                    console.log(quote)
-        
-                    const _user = await updateUserTokens02(
-                        user.chatId,
-                        user.userId,
-                        quote,
-                        token.address
-                    )
-                    console.log(_user)
-        
-                    const { price_change, price_change_percent, points } = calculateXP(token.initialPrice, quote)
-                    console.log(price_change, price_change_percent, points)
-        
-                    if (points != 0) {
-                        const $user = await updateUserPoints(user.chatId, user.userId, points)
-                        console.log($user)
-                    }
+            user.tokens.forEach(async token => {
+                const [_, quote] = await getPrice(token.address)
+                const _user = await updateUserTokens02(
+                    user.chatId,
+                    user.userId,
+                    quote,
+                    token.address
+                )
     
-                    const totalPoints = user.points + points
-                    const xp = totalPoints / tokens
-                    console.log(tokens, totalPoints, xp)
-                    
-                    const user_ = await updateUserXP(user.chatId, user.userId, xp)
-                    console.log(user_)
-                })   
-            }
+                const { price_change, price_change_percent, points } = calculateXP(token.initialPrice, quote)
+                console.log(price_change, price_change_percent, points, "points")
+    
+                if (points != 0) {
+                    const $user = await updateUserPoints(user.chatId, user.userId, points)
+                    // console.log($user)
+                }
+
+                const totalPoints = user.points + points
+                const xp = totalPoints / tokens
+                console.log(tokens, totalPoints, xp, "xp")
+                
+                const user_ = await updateUserXP(user.chatId, user.userId, xp)
+            })   
         })
     }
 }
