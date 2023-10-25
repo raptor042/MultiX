@@ -143,6 +143,18 @@ export const updateUserTokens02 = async (chatId, userId, price, address) => {
     }
 }
 
+export const findToken = async (chatId, address) => {
+    try {
+        const user = await UserModel.findOne(
+            { chatId : chatId, tokens : { $elemMatch : { address : address } } }
+        )
+
+        return user
+    } catch (err) {
+        console.log(err)
+    }
+}
+
 export const updateUserPoints = async (chatId, userId, points) => {
     try {
         const user = await UserModel.findOneAndUpdate(

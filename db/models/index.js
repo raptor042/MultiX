@@ -18,8 +18,8 @@ const UserSchema = new Schema({
 
 const ChatSchema = new Schema({
     chatId : { type : Number, required : true },
-    CA_tracking : { type : String, enum : ["Enabled", "Disabled"], default : "Disabled" },
-    ECA_tracking : { type : String, enum : ["Enabled", "Disabled"], default : "Disabled" },
+    CA_tracking : { type : String, enum : ["Enabled", "Disabled"], default : "Enabled" },
+    ECA_tracking : { type : String, enum : ["Enabled", "Disabled"], default : "Enabled" },
     type : String
 })
 

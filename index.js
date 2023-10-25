@@ -1,8 +1,8 @@
 import { Telegraf, Markup } from "telegraf"
 import { config } from "dotenv"
 import { addTracking, addUser, connectDB, getChat, getUsersInDesc, updateTracking, updateUserPointsAndXP, updateUserTokens01 } from "./db/index.js"
-import { getCurrentPrices, getPair, getPrice, price } from "./controllers/index.js"
-import { chatExists, extract, userExists } from "./controllers/misc.js"
+import { getCurrentPrices, getPrice } from "./controllers/index.js"
+import { chatExists, contractExists, extract, userExists } from "./controllers/misc.js"
 
 config()
 
@@ -103,39 +103,46 @@ bot.hears(/0x/, async ctx => {
             )
             console.log(chat)
         }
+        
 
         const chat = await getChat(ctx.chat.id)
 
         if(chat.CA_tracking == "Enabled" || chat.ECA_tracking == "Enabled") {
             const address = extract(ctx.message.text)
-            console.log(address)
+            const contract_exists = await contractExists(address, ctx.chat.id)
+            console.log(address, contract_exists)
 
-            const [token0, quote] = await getPrice(address)
-            console.log(token0, quote)
+            if(!contract_exists) {
+                const [token0, quote] = await getPrice(address)
+                console.log(token0, quote)
 
-            if(token0 == null) {
-                const user = await updateUserTokens01(
-                    ctx.chat.id,
-                    ctx.message.from.id,
-                    address,
-                    quote
-                )
-                console.log(user)
+                if(token0 == null) {
+                    const user = await updateUserTokens01(
+                        ctx.chat.id,
+                        ctx.message.from.id,
+                        address,
+                        quote
+                    )
+                    console.log(user)
+                } else {
+                    const user = await updateUserTokens01(
+                        ctx.chat.id,
+                        ctx.message.from.id,
+                        token0,
+                        quote
+                    )
+                    console.log(user)
+                }
+
+                if(quote > 0) {
+                    await ctx.replyWithHTML(`<b>🚀 Contract detected, tracking Xs.</b>`)
+                } else {
+                    await ctx.replyWithHTML(`<b>🚀 ECA detected, tracking Xs will begin once liquidity is added.</b>`)
+                }
             } else {
-                const user = await updateUserTokens01(
-                    ctx.chat.id,
-                    ctx.message.from.id,
-                    token0,
-                    quote
-                )
-                console.log(user)
+                await ctx.replyWithHTML(`<b>🚫 This token has already been shilled in this group.</b>`)
             }
 
-            if(quote > 0) {
-                await ctx.replyWithHTML(`<b>🚀 Contract detected, tracking Xs.</b>`)
-            } else {
-                await ctx.replyWithHTML(`<b>🚀 ECA detected, tracking Xs will begin once liquidity is added.</b>`)
-            }
         }
     } else {
         await ctx.reply("Add this bot to a group to begin using it.")

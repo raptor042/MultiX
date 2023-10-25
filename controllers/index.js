@@ -1,4 +1,4 @@
-import { ethers } from "ethers"
+import { ethers, isError } from "ethers"
 import { UNISWAPV2_PAIR_ABI, UNISWAPV2_ROUTER02_ABI, UNISWAPV2_ROUTER02_ADDRESS, WETH_ADDRESS } from "./config.js"
 import { getProvider } from "./provider.js"
 import { getUsers, updateUserPoints, updateUserTokens02, updateUserXP } from "../db/index.js"
@@ -39,18 +39,12 @@ export const price = async (address) => {
         getProvider()
     )
 
-    try {
-        const amountsOut = await uniswap.getAmountsOut(
-            ethers.parseEther("1"),
-            [address, WETH_ADDRESS]
-        )
-    
-        return ethers.formatEther(amountsOut[1])   
-    } catch (err) {
-        console.log(err)
+    const amountsOut = await uniswap.getAmountsOut(
+        ethers.parseEther("1"),
+        [address, WETH_ADDRESS]
+    )
 
-        return 0
-    }
+    return ethers.formatEther(amountsOut[1])
 }
 
 export const getPrice = async (address) => {
@@ -60,15 +54,19 @@ export const getPrice = async (address) => {
 
         return [null, quote]
     } catch (err) {
-        console.log(err)
+        if(isError(err, "CALL_EXCEPTION")) {
+            console.log("Call Exception Error")
 
-        const [token0, _] = await getPair(address)
-        console.log(token0)
+            const [token0, _] = await getPair(address)
+            console.log(token0)
 
-        const quote = await price(token0)
-        console.log(quote)
+            const quote = await price(token0)
+            console.log(quote)
 
-        return [token0, quote]
+            return [token0, quote]
+        } else {
+            return [null, 0]
+        }
     }
 }
 
@@ -81,7 +79,7 @@ export const getCurrentPrices = async () => {
 
             if(user.CA_tracking == "Enabled" || user.ECA_tracking == "Enabled") {
                 user.tokens.forEach(async token => {
-                    const quote = await price(token.address)
+                    const quote = await getPrice(token.address)
                     console.log(quote)
         
                     const _user = await updateUserTokens02(

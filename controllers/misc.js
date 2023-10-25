@@ -1,4 +1,4 @@
-import { getChat, getUser } from "../db/index.js"
+import { findToken, getChat, getUser } from "../db/index.js"
 
 export const userExists = async (userId, chatId) => {
     const user = await getUser(userId, chatId)
@@ -12,6 +12,13 @@ export const chatExists = async (chatId) => {
     console.log(chat)
 
     return chat ? true : false
+}
+
+export const contractExists = async (address, chatId) => {
+    const contract = await findToken(chatId, address)
+    console.log(contract)
+
+    return contract ? true : false
 }
 
 export const extract = (str) => {
