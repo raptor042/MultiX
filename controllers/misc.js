@@ -16,7 +16,7 @@ export const chatExists = async (chatId) => {
 
 export const extract = (str) => {
     const startIndex = str.indexOf("0x")
-    const endIndex = startIndex + 42 + 1
+    const endIndex = startIndex + 42
     console.log(startIndex, endIndex)
 
     const address = str.slice(startIndex, endIndex)

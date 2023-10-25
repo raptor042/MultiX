@@ -47,6 +47,25 @@ export const price = async (address) => {
     return ethers.formatEther(amountsOut[1])
 }
 
+export const getPrice = async (address) => {
+    try {
+        const quote = await price(address)
+        console.log(quote)
+
+        return [null, quote]
+    } catch (err) {
+        console.log(err)
+
+        const [token0, _] = await getPair(address)
+        console.log(token0)
+
+        const quote = await price(token0)
+        console.log(quote)
+
+        return [token0, quote]
+    }
+}
+
 export const getCurrentPrices = async () => {
     const users = await getUsers()
 
