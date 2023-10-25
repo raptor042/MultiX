@@ -39,12 +39,18 @@ export const price = async (address) => {
         getProvider()
     )
 
-    const amountsOut = await uniswap.getAmountsOut(
-        ethers.parseEther("1"),
-        [address, WETH_ADDRESS]
-    )
+    try {
+        const amountsOut = await uniswap.getAmountsOut(
+            ethers.parseEther("1"),
+            [address, WETH_ADDRESS]
+        )
+    
+        return ethers.formatEther(amountsOut[1])   
+    } catch (err) {
+        console.log(err)
 
-    return ethers.formatEther(amountsOut[1])
+        return 0
+    }
 }
 
 export const getPrice = async (address) => {
