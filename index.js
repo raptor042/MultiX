@@ -1,6 +1,6 @@
 import { Telegraf, Markup } from "telegraf"
 import { config } from "dotenv"
-import { addTracking, addUser, connectDB, getChat, getUsersInDesc, updateTracking, updateUserPointsAndXP, updateUserTokens01 } from "./db/index.js"
+import { addTracking, addUser, connectDB, getChat, getUsersInDescI, getUsersInDescII, updateTracking, updateUserPointsAndXP, updateUserTokens01 } from "./db/index.js"
 import { getCurrentPrices, getPrice } from "./controllers/index.js"
 import { chatExists, contractExists, extract, userExists } from "./controllers/misc.js"
 
@@ -14,7 +14,7 @@ bot.use(Telegraf.log())
 
 bot.command("track", async ctx => {
     try { 
-        if (ctx.chat.type == "group" || "supergroup" || "channel") {
+        if (ctx.message.chat.type != "private") {
             const user_exists = await userExists(ctx.message.from.id, ctx.chat.id)
             const chat_exists = await chatExists(ctx.chat.id)
 
@@ -30,7 +30,7 @@ bot.command("track", async ctx => {
             if (!chat_exists) {
                 const chat = await addTracking(
                     ctx.chat.id,
-                    ctx.chat.type
+                    ctx.message.chat.type
                 )
                 console.log(chat)
             }
@@ -119,7 +119,7 @@ bot.action("disableECA", async ctx => {
 
 bot.hears(/0x/, async ctx => {
     try {
-        if (ctx.chat.type == "group" || "supergroup" || "channel") {
+        if (ctx.message.chat.type != "private") {
             const user_exists = await userExists(ctx.message.from.id, ctx.chat.id)
             const chat_exists = await chatExists(ctx.chat.id)
 
@@ -135,7 +135,7 @@ bot.hears(/0x/, async ctx => {
             if (!chat_exists) {
                 const chat = await addTracking(
                     ctx.chat.id,
-                    ctx.chat.type
+                    ctx.message.chat.type
                 )
                 console.log(chat)
             }
@@ -201,7 +201,7 @@ bot.hears(/0x/, async ctx => {
 
 bot.command("leaderboard", async ctx => {
     try {
-        if (ctx.chat.type == "group" || "supergroup" || "channel") {
+        if (ctx.message.chat.type != "private") {
             const user_exists = await userExists(ctx.message.from.id, ctx.chat.id)
             const chat_exists = await chatExists(ctx.chat.id)
 
@@ -217,12 +217,12 @@ bot.command("leaderboard", async ctx => {
             if (!chat_exists) {
                 const chat = await addTracking(
                     ctx.chat.id,
-                    ctx.chat.type
+                    ctx.message.chat.type
                 )
                 console.log(chat)
             }
 
-            const users = await getUsersInDesc(ctx.chat.id)
+            const users = await getUsersInDescI(ctx.chat.id)
             console.log(users)
 
             let markup = `<b>📊<u>Leaderboard</u>📊</b>\n\n<i>Most Xs provided by users in this group</i>\n\n`
@@ -239,6 +239,62 @@ bot.command("leaderboard", async ctx => {
                     markup += html   
                 } else {
                     const html = `<i>${index + 1} @${user.username}</i>\n<i>🎯 <b>Points:</b> ${user.points}</i>\n<i>💰 <b>Tokens Shilled:</b> ${user.tokens.length}</i>\n<i>🚀 <b>Average Xs:</b> ${user.xp}</i>\n\n`
+                    markup += html
+                }
+            })
+
+            await ctx.replyWithHTML(markup)
+        } else {
+            await ctx.reply("Add this bot to a group to begin using it.")
+        }
+    } catch (err) {
+        console.log("TG Error")
+        // await ctx.replyWithHTML(`<b>🚫 Sorry for the Inconveniences.</b>`)
+
+        bot.launch()
+    }
+})
+
+bot.command("global_leaderboard", async ctx => {
+    try {
+        if (ctx.message.chat.type != "private") {
+            const user_exists = await userExists(ctx.message.from.id, ctx.chat.id)
+            const chat_exists = await chatExists(ctx.chat.id)
+
+            if (!user_exists) {
+                const user = await addUser(
+                    ctx.message.from.username,
+                    ctx.chat.title,
+                    ctx.message.from.id,
+                    ctx.chat.id
+                )
+                console.log(user)
+            }
+            if (!chat_exists) {
+                const chat = await addTracking(
+                    ctx.chat.id,
+                    ctx.message.chat.type
+                )
+                console.log(chat)
+            }
+
+            const users = await getUsersInDescII()
+            console.log(users)
+
+            let markup = `<b>📊<u>Leaderboard</u>📊</b>\n\n<i>Most Xs provided by users in the entire ecosystem</i>\n\n`
+
+            users.forEach((user, index) => {
+                if (index == 0) {
+                    const html = `<i>🏆 @${user.username}</i>\n<i>🎯 <b>Points:</b> ${user.points}</i>\n<i>💰 <b>Tokens Shilled:</b> ${user.tokens.length}</i>\n<i>🚀 <b>Average Xs:</b> ${user.xp}</i>\n<i>🔰 <b>Group:</b> ${user.chat}</i>\n\n`
+                    markup += html
+                } else if(index == 1) {
+                    const html = `<i>🥈 @${user.username}</i>\n<i>🎯 <b>Points:</b> ${user.points}</i>\n<i>💰 <b>Tokens Shilled:</b> ${user.tokens.length}</i>\n<i>🚀 <b>Average Xs:</b> ${user.xp}</i>\n<i>🔰 <b>Group:</b> ${user.chat}</i>\n\n`
+                    markup += html   
+                } else if(index == 2) {
+                    const html = `<i>🥉 @${user.username}</i>\n<i>🎯 <b>Points:</b> ${user.points}</i>\n<i>💰 <b>Tokens Shilled:</b> ${user.tokens.length}</i>\n<i>🚀 <b>Average Xs:</b> ${user.xp}</i>\n<i>🔰 <b>Group:</b> ${user.chat}</i>\n\n`
+                    markup += html   
+                } else {
+                    const html = `<i>${index + 1} @${user.username}</i>\n<i>🎯 <b>Points:</b> ${user.points}</i>\n<i>💰 <b>Tokens Shilled:</b> ${user.tokens.length}</i>\n<i>🚀 <b>Average Xs:</b> ${user.xp}</i>\n<i>🔰 <b>Group:</b> ${user.chat}</i>\n\n`
                     markup += html
                 }
             })

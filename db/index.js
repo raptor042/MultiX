@@ -47,9 +47,19 @@ export const getUsers = async () => {
     }
 }
 
-export const getUsersInDesc = async (chatId) => {
+export const getUsersInDescI = async (chatId) => {
     try {
         const users = await UserModel.find({ chatId : chatId }).sort({ points : -1 })
+
+        return users
+    } catch (err) {
+        console.log(err)
+    }
+}
+
+export const getUsersInDescII = async (chatId) => {
+    try {
+        const users = await UserModel.find().sort({ points : -1 })
 
         return users
     } catch (err) {
