@@ -6,7 +6,7 @@ const UserSchema = new Schema({
     username : String,
     userId : { type : Number, required : true },
     points : { type : Number, default : 0 },
-    xp : { type : Number, default : 0.0 },
+    xp : { type : Number, default : 0 },
     tokens : [
         {
             address : String,

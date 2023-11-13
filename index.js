@@ -2,7 +2,7 @@ import { Telegraf, Markup } from "telegraf"
 import { config } from "dotenv"
 import { addTracking, addUser, connectDB, getChat, getUsersInDescI, getUsersInDescII, updateTracking, updateUserPointsAndXP, updateUserTokens01 } from "./db/index.js"
 import { getCurrentPrices, getPrice } from "./controllers/index.js"
-import { chatExists, contractExists, extract, userExists } from "./controllers/misc.js"
+import { aggregate, chatExists, contractExists, extract, userExists } from "./controllers/misc.js"
 
 config()
 
@@ -36,7 +36,7 @@ bot.command("track", async ctx => {
             }
 
             await ctx.replyWithHTML(
-                `<b>🏆 The first bot to track who truly provides the most Xs!</b>\n\n<i>Powered by MultiX.</i>`,
+                `<b>🏆 Track your group's alpha and earn $RAZE rewards accordingly!</b>\n\n<i>Powered by Raze.</i>`,
                 {
                     parse_mode : "HTML",
                     ...Markup.inlineKeyboard([
@@ -45,8 +45,7 @@ bot.command("track", async ctx => {
                         [Markup.button.callback("Enable ECAs ✅", "enableECA")],
                         [Markup.button.callback("Disable ECAs 🚫", "disableECA")],
                         [Markup.button.callback("Reset Stats ⚠️", "reset")],
-                        [Markup.button.url("Support", "https://t.me/NeutronCrypto")],
-                        [Markup.button.url("Multix TG", "https://t.me/MultiXERC")]
+                        [Markup.button.url("Support", "https://t.me/NeutronCrypto")]
                     ])
                 }
             )
@@ -255,7 +254,7 @@ bot.command("leaderboard", async ctx => {
     }
 })
 
-bot.command("global_leaderboard", async ctx => {
+bot.command("global", async ctx => {
     try {
         if (ctx.message.chat.type != "private") {
             const user_exists = await userExists(ctx.message.from.id, ctx.chat.id)
@@ -278,23 +277,24 @@ bot.command("global_leaderboard", async ctx => {
                 console.log(chat)
             }
 
-            const users = await getUsersInDescII()
+            const _users = await getUsersInDescII()
+            const users = aggregate(_users)
             console.log(users)
 
             let markup = `<b>📊<u>Leaderboard</u>📊</b>\n\n<i>Most Xs provided by users in the entire ecosystem</i>\n\n`
 
             users.forEach((user, index) => {
                 if (index == 0) {
-                    const html = `<i>🏆 @${user.username}</i>\n<i>🎯 <b>Points:</b> ${user.points}</i>\n<i>💰 <b>Tokens Shilled:</b> ${user.tokens.length}</i>\n<i>🚀 <b>Average Xs:</b> ${user.xp}</i>\n<i>🔰 <b>Group:</b> ${user.chat}</i>\n\n`
+                    const html = `<i>🏆 @${user.username}</i>\n<i>🎯 <b>Points:</b> ${user.points}</i>\n<i>💰 <b>Tokens Shilled:</b> ${user.shilled}</i>\n<i>🚀 <b>Average Xs:</b> ${user.xps}</i>\n\n`
                     markup += html
                 } else if(index == 1) {
-                    const html = `<i>🥈 @${user.username}</i>\n<i>🎯 <b>Points:</b> ${user.points}</i>\n<i>💰 <b>Tokens Shilled:</b> ${user.tokens.length}</i>\n<i>🚀 <b>Average Xs:</b> ${user.xp}</i>\n<i>🔰 <b>Group:</b> ${user.chat}</i>\n\n`
+                    const html = `<i>🥈 @${user.username}</i>\n<i>🎯 <b>Points:</b> ${user.points}</i>\n<i>💰 <b>Tokens Shilled:</b> ${user.shilled}</i>\n<i>🚀 <b>Average Xs:</b> ${user.xps}</i>\n\n`
                     markup += html   
                 } else if(index == 2) {
-                    const html = `<i>🥉 @${user.username}</i>\n<i>🎯 <b>Points:</b> ${user.points}</i>\n<i>💰 <b>Tokens Shilled:</b> ${user.tokens.length}</i>\n<i>🚀 <b>Average Xs:</b> ${user.xp}</i>\n<i>🔰 <b>Group:</b> ${user.chat}</i>\n\n`
+                    const html = `<i>🥉 @${user.username}</i>\n<i>🎯 <b>Points:</b> ${user.points}</i>\n<i>💰 <b>Tokens Shilled:</b> ${user.shilled}</i>\n<i>🚀 <b>Average Xs:</b> ${user.xps}</i>\n\n`
                     markup += html   
                 } else {
-                    const html = `<i>${index + 1} @${user.username}</i>\n<i>🎯 <b>Points:</b> ${user.points}</i>\n<i>💰 <b>Tokens Shilled:</b> ${user.tokens.length}</i>\n<i>🚀 <b>Average Xs:</b> ${user.xp}</i>\n<i>🔰 <b>Group:</b> ${user.chat}</i>\n\n`
+                    const html = `<i>${index + 1} @${user.username}</i>\n<i>🎯 <b>Points:</b> ${user.points}</i>\n<i>💰 <b>Tokens Shilled:</b> ${user.shilled}</i>\n<i>🚀 <b>Average Xs:</b> ${user.xps}</i>\n\n`
                     markup += html
                 }
             })
@@ -327,6 +327,6 @@ bot.action("reset", async ctx => {
 
 connectDB()
 
-setInterval(getCurrentPrices, 60000)
+setInterval(getCurrentPrices, 30000)
 
 bot.launch()
