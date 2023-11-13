@@ -44,8 +44,7 @@ bot.command("track", async ctx => {
                         [Markup.button.callback("Disable CA Monitoring 🚫", "disableCA")],
                         [Markup.button.callback("Enable ECAs ✅", "enableECA")],
                         [Markup.button.callback("Disable ECAs 🚫", "disableECA")],
-                        [Markup.button.callback("Reset Stats ⚠️", "reset")],
-                        [Markup.button.url("Support", "https://t.me/NeutronCrypto")]
+                        [Markup.button.callback("Reset Stats ⚠️", "reset")]
                     ])
                 }
             )
