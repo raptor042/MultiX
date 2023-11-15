@@ -326,6 +326,6 @@ bot.action("reset", async ctx => {
 
 connectDB()
 
-setInterval(getCurrentPrices, 30000)
+setInterval(getCurrentPrices, 60000)
 
 bot.launch()
