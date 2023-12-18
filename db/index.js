@@ -10,7 +10,7 @@ const URI = process.env.MONGO_URI
 
 export const connectDB = async () => {
     try {
-        await connect(`${URI}`, { useNewUrlParser : true, useUnifiedTopology : true })
+        await connect(`${URI}`)
         console.log("Connection to the Database was successful.")
     } catch(err) {
         console.log(err)

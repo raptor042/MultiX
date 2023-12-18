@@ -36,7 +36,7 @@ bot.command("track", async ctx => {
             }
 
             await ctx.replyWithHTML(
-                `<b>🏆 Track your group's alpha and earn $RAZE rewards accordingly!</b>\n\n<i>Powered by Raze.</i>`,
+                `<b>🏆 Track your group's alpha and earn $XMAS rewards accordingly!</b>\n\n<i>Powered by XMasBullBot.</i>`,
                 {
                     parse_mode : "HTML",
                     ...Markup.inlineKeyboard([
@@ -53,9 +53,7 @@ bot.command("track", async ctx => {
         }
     } catch (err) {
         console.log("TG Error")
-        // await ctx.replyWithHTML(`<b>🚫 Sorry for the Inconveniences.</b>`)
-
-        bot.launch()
+        await ctx.replyWithHTML(`<b>🚫 Sorry for the Inconveniences.</b>`)
     }
 })
 
@@ -67,9 +65,7 @@ bot.action("enableCA", async ctx => {
         await ctx.replyWithHTML("<b>Contract Tracking is enabled ✅</b>")
     } catch (err) {
         console.log("TG Error")
-        // await ctx.replyWithHTML(`<b>🚫 Sorry for the Inconveniences.</b>`)
-
-        bot.launch()
+        await ctx.replyWithHTML(`<b>🚫 Sorry for the Inconveniences.</b>`)
     }
 })
 
@@ -81,9 +77,7 @@ bot.action("disableCA", async ctx => {
         await ctx.replyWithHTML("<b>Contract Tracking is disabled 🚫</b>")
     } catch (err) {
         console.log("TG Error")
-        // await ctx.replyWithHTML(`<b>🚫 Sorry for the Inconveniences.</b>`)
-
-        bot.launch()
+        await ctx.replyWithHTML(`<b>🚫 Sorry for the Inconveniences.</b>`)
     }
 })
 
@@ -95,9 +89,7 @@ bot.action("enableECA", async ctx => {
         await ctx.replyWithHTML("<b>ECA Tracking is enabled ✅</b>")
     } catch (err) {
         console.log("TG Error")
-        // await ctx.replyWithHTML(`<b>🚫 Sorry for the Inconveniences.</b>`)
-
-        bot.launch()
+        await ctx.replyWithHTML(`<b>🚫 Sorry for the Inconveniences.</b>`)
     }
 })
 
@@ -109,9 +101,7 @@ bot.action("disableECA", async ctx => {
         await ctx.replyWithHTML("<b>ECA Tracking is disabled 🚫</b>")
     } catch (err) {
         console.log("TG Error")
-        // await ctx.replyWithHTML(`<b>🚫 Sorry for the Inconveniences.</b>`)
-
-        bot.launch()
+        await ctx.replyWithHTML(`<b>🚫 Sorry for the Inconveniences.</b>`)
     }
 })
 
@@ -191,9 +181,7 @@ bot.hears(/0x/, async ctx => {
         }
     } catch (err) {
         console.log("TG Error")
-        // await ctx.replyWithHTML(`<b>🚫 Sorry for the Inconveniences.</b>`)
-
-        bot.launch()
+        await ctx.replyWithHTML(`<b>🚫 Sorry for the Inconveniences.</b>`)
     }
 })
 
@@ -247,9 +235,7 @@ bot.command("leaderboard", async ctx => {
         }
     } catch (err) {
         console.log("TG Error")
-        // await ctx.replyWithHTML(`<b>🚫 Sorry for the Inconveniences.</b>`)
-
-        bot.launch()
+        await ctx.replyWithHTML(`<b>🚫 Sorry for the Inconveniences.</b>`)
     }
 })
 
@@ -304,9 +290,7 @@ bot.command("global", async ctx => {
         }
     } catch (err) {
         console.log("TG Error")
-        // await ctx.replyWithHTML(`<b>🚫 Sorry for the Inconveniences.</b>`)
-
-        bot.launch()
+        await ctx.replyWithHTML(`<b>🚫 Sorry for the Inconveniences.</b>`)
     }
 })
 
@@ -318,9 +302,7 @@ bot.action("reset", async ctx => {
         await ctx.replyWithHTML("<b>The Leaderboard have been reset.</b>\n\n<b>Lets go again!!! 🚀</b>")
     } catch (err) {
         console.log("TG Error")
-        // await ctx.replyWithHTML(`<b>🚫 Sorry for the Inconveniences.</b>`)
-
-        bot.launch()
+        await ctx.replyWithHTML(`<b>🚫 Sorry for the Inconveniences.</b>`)
     }
 })
 
@@ -329,7 +311,3 @@ connectDB()
 setInterval(getCurrentPrices, 60000)
 
 bot.launch()
-
-process.once("SIGINT", () => bot.stop("SIGINT"))
-
-process.once("SIGTERM", () => bot.stop("SIGTERM"))
