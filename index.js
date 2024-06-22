@@ -1,8 +1,8 @@
 import { Telegraf, Markup } from "telegraf"
 import { config } from "dotenv"
-import { addTracking, addUser, connectDB, getChat, getUsersInDescI, getUsersInDescII, updateTracking, updateUserPointsAndXP, updateUserTokens01 } from "./db/index.js"
-import { getCurrentPrices, getPrice } from "./controllers/index.js"
-import { aggregate, chatExists, contractExists, extract, userExists } from "./controllers/misc.js"
+import { addTracking, addUser, connectDB, getChat, getUsersInDescI, getUsersInDescII, updateTracking, updateUserPointsAndXP, updateUserTokens01 } from "./__db__/index.js"
+import { getCurrentPrices, getPrice } from "./__web3__/index.js"
+import { aggregate, chatExists, contractExists, extract, userExists } from "./misc.js"
 
 config()
 
@@ -11,6 +11,10 @@ const URL = process.env.TELEGRAM_BOT_API
 const bot = new Telegraf(URL)
 
 bot.use(Telegraf.log())
+
+bot.command("start", async ctx => {
+    await ctx.replyWithHTML(`<b>🏆 Track your group's alpha and earn rewards accordingly!</b>\n\n<i>Powered by AlphaDevBot.</i>`)
+})
 
 bot.command("track", async ctx => {
     try { 
@@ -36,7 +40,7 @@ bot.command("track", async ctx => {
             }
 
             await ctx.replyWithHTML(
-                `<b>🏆 Track your group's alpha and earn $XMAS rewards accordingly!</b>\n\n<i>Powered by XMasBullBot.</i>`,
+                `<b>🏆 Track your group's alpha and earn rewards accordingly!</b>\n\n<i>Powered by AlphaDevBot.</i>`,
                 {
                     parse_mode : "HTML",
                     ...Markup.inlineKeyboard([
@@ -49,7 +53,7 @@ bot.command("track", async ctx => {
                 }
             )
         } else {
-            await ctx.reply("Add this bot to a group to begin using it.")
+            await ctx.reply("⚠️ Add this bot to a group to begin using it.")
         }
     } catch (err) {
         console.log("TG Error")
@@ -231,7 +235,7 @@ bot.command("leaderboard", async ctx => {
 
             await ctx.replyWithHTML(markup)
         } else {
-            await ctx.reply("Add this bot to a group to begin using it.")
+            await ctx.reply("⚠️ Add this bot to a group to begin using it.")
         }
     } catch (err) {
         console.log("TG Error")
@@ -286,7 +290,7 @@ bot.command("global", async ctx => {
 
             await ctx.replyWithHTML(markup)
         } else {
-            await ctx.reply("Add this bot to a group to begin using it.")
+            await ctx.reply("⚠️ Add this bot to a group to begin using it.")
         }
     } catch (err) {
         console.log("TG Error")
@@ -308,6 +312,6 @@ bot.action("reset", async ctx => {
 
 connectDB()
 
-setInterval(getCurrentPrices, 60000)
+setInterval(getCurrentPrices, 30 * 1000)
 
 bot.launch()

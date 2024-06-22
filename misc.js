@@ -1,4 +1,4 @@
-import { findToken, getChat, getUser } from "../db/index.js"
+import { findToken, getChat, getUser } from "./__db__/index.js"
 
 const exists = (users, userID) => {
     let _exists = false

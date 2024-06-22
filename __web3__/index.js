@@ -1,7 +1,7 @@
 import { ethers } from "ethers"
 import { UNISWAPV2_PAIR_ABI, UNISWAPV2_ROUTER02_ABI, UNISWAPV2_ROUTER02_ADDRESS, WETH_ADDRESS } from "./config.js"
 import { getProvider } from "./provider.js"
-import { getUsers, updateUserPoints, updateUserTokens02, updateUserXP } from "../db/index.js"
+import { getUsers, updateUserPoints, updateUserTokens02, updateUserXP } from "../__db__/index.js"
 
 const calculateXP = (initialPrice, currentPrice) => {
     const price_change = currentPrice - initialPrice
