@@ -1,5 +1,5 @@
 import { ethers } from "ethers"
-import { UNISWAPV2_PAIR_ABI, UNISWAPV2_ROUTER02_ABI, UNISWAPV2_ROUTER02_ADDRESS, WETH_ADDRESS } from "./config.js"
+import { UNISWAPV2_FACTORY_ABI, UNISWAPV2_FACTORY_ADDRESS, UNISWAPV2_PAIR_ABI, UNISWAPV2_ROUTER02_ABI, UNISWAPV2_ROUTER02_ADDRESS, WETH_ADDRESS } from "./config.js"
 import { getProvider } from "./provider.js"
 import { getUsers, updateUserPoints, updateUserTokens02, updateUserXP } from "../__db__/index.js"
 
@@ -20,55 +20,44 @@ const calculateXP = (initialPrice, currentPrice) => {
 }
 
 export const getPair = async (address) => {
-    const uniswap = new ethers.Contract(
-        address,
-        UNISWAPV2_PAIR_ABI,
+    const factory = new ethers.Contract(
+        UNISWAPV2_FACTORY_ADDRESS,
+        UNISWAPV2_FACTORY_ABI.abi,
         getProvider()
     )
 
-    return [
-        await uniswap.token0(),
-        await uniswap.token1()
-    ]
+    const pair = await factory.getPair(address, WETH_ADDRESS)
+    console.log(pair)
+
+    return pair
 }
 
 export const price = async (address) => {
-    const uniswap = new ethers.Contract(
-        UNISWAPV2_ROUTER02_ADDRESS,
-        UNISWAPV2_ROUTER02_ABI,
+    const pair = new ethers.Contract(
+        address,
+        UNISWAPV2_PAIR_ABI.abi,
         getProvider()
     )
 
-    const amountsOut = await uniswap.getAmountsOut(
-        ethers.parseEther("1"),
-        [address, WETH_ADDRESS]
-    )
+    const reserves = await pair.getReserves()
+    console.log(reserves)
 
-    return ethers.formatEther(amountsOut[1])
+    const quote = Number(ethers.formatEther(reserves[1])) / Number(ethers.formatEther(reserves[0]))
+    console.log(quote)
+
+    return quote
 }
 
 export const getPrice = async (address) => {
-    let quote = null
-
     try {
-        const [token0, _] = await getPair(address)
-        console.log(token0)
+        const pair = await getPair(address)
+        const quote = await price(pair)
 
-        quote = await price(token0)
-        console.log(quote)
-
-        return [token0, quote]
+        return quote
     } catch (err) {
         console.log(err)
 
-        quote = await price(address)
-        console.log(quote)
-
-        return [null, quote]
-    } finally {
-        if (quote == null) {
-            return [null, null]
-        }
+        return null
     }
 }
 
@@ -80,7 +69,7 @@ export const getCurrentPrices = async () => {
             const tokens = user.tokens.length
 
             user.tokens.forEach(async token => {
-                const [_, quote] = await getPrice(token.address)
+                const quote = await getPrice(token.address)
                 const _user = await updateUserTokens02(
                     user.chatId,
                     user.userId,

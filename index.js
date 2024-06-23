@@ -141,10 +141,9 @@ bot.hears(/0x/, async ctx => {
                 console.log(address, contract_exists)
 
                 if(!contract_exists) {
-                    const [token0, quote] = await getPrice(address)
-                    console.log(token0, quote)
+                    const quote = await getPrice(address)
 
-                    if(token0 == null && quote != null) {
+                    if(quote != null) {
                         const user = await updateUserTokens01(
                             ctx.chat.id,
                             ctx.message.from.id,
@@ -158,22 +157,8 @@ bot.hears(/0x/, async ctx => {
                         } else {
                             await ctx.replyWithHTML(`<b>🚀 ECA detected, tracking Xs will begin once liquidity is added.</b>`)
                         }
-                    } else if(token0 == null && quote == null) {
-                        await ctx.replyWithHTML(`<b>🚫 Cannot track this address.</b>`)
                     } else {
-                        const user = await updateUserTokens01(
-                            ctx.chat.id,
-                            ctx.message.from.id,
-                            token0,
-                            quote
-                        )
-                        console.log(user)
-
-                        if(quote > 0) {
-                            await ctx.replyWithHTML(`<b>🚀 Contract detected, tracking Xs.</b>`)
-                        } else {
-                            await ctx.replyWithHTML(`<b>🚀 ECA detected, tracking Xs will begin once liquidity is added.</b>`)
-                        }
+                        await ctx.replyWithHTML(`<b>🚫 Cannot track this address.</b>`)
                     }
                 } else {
                     await ctx.replyWithHTML(`<b>🚫 This token has already been shilled in this group.</b>`)
